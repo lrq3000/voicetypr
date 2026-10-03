@@ -1,7 +1,7 @@
 # Plan 082 — CrispASR local engines and Auto spoken language
 
 Status: DESIGN APPROVED IN CONVERSATION — OpenCode (OpenAI gpt-6-astra),
-2026-10-04. Written specification awaiting founder review. Baseline:
+2026-10-04. Written specification approved by the founder. Baseline:
 `70c904a1`. Branch: `feat/crispasr-auto-language`; worktree:
 `.worktrees/crispasr-auto`.
 
