@@ -27,6 +27,8 @@ Verification commands used across all plans: `pnpm typecheck`, `pnpm lint`,
 
 ## Active plans
 
+Plan 082 — IN PROGRESS — claimed OpenCode (OpenAI gpt-6-astra) 2026-10-04: CrispASR-backed Parakeet Ultra Q8_0 and Confucius4-R2T2 Q4_K/Q8_0 on macOS and Windows, background decoding, and Auto spoken language. Founder approved the sidecar design and both R2T2 quantizations. See `082-crispasr-local-engines.md`.
+
 Current audio/streaming continuation: [Plan 069](069-handy-informed-audio-streaming-recovery.md)
 and the [research entry point](../docs/RESEARCH-AND-RECOVERY.md). These reconcile
 the historical research and plan statuses against the integration application
