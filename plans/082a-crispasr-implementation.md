@@ -149,6 +149,18 @@ steps, `docs/ARCHITECTURE.md`, `plans/SMOKE.md`, the real-speech harness under
 
 ## Execution notes
 
+- Founder requested and approved a Windows shipped-bindings prerequisite:
+  local `whisper-rs-sys` patch, original checksum-pinned 1.76 MB source archive,
+  x64/ARM64 generated snapshots, and native C/Rust ABI checks. The unpatched
+  option reproduced three Linux CRT size-assertion failures on Windows. The
+  x64 ABI test now passes with an invalid `LIBCLANG_PATH`. The application
+  compiled with shipped bindings and its 46 language tests passed after the
+  standard Common-Controls manifest was embedded. Vulkan-sidecar Rust checking
+  also passed (`DOCS_RS=1`, so this is not a native Vulkan link/smoke check).
+- The founder approved moving this session's build cache to
+  `D:\voicetypr-build\crispasr-auto` after C: ran out of disk during app linking.
+  A worktree-local `src-tauri/target` junction preserves cached native paths.
+
 - 2026-10-04: 43 baseline frontend tests pass across model preview controls,
   island quick settings and settings persistence. Existing Vite config warning
   and the expected rejected-settings test diagnostic are present at baseline.
