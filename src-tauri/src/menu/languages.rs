@@ -49,6 +49,9 @@ pub fn supported(model: &str, engine: &str, cloud_model: Option<&str>) -> Vec<(S
             name.clone(),
         )
     });
+    if crate::commands::speech_language::supports_auto_speech_language(engine, model) {
+        languages.insert(0, ("auto".into(), "Auto".into()));
+    }
     languages
 }
 #[cfg(test)]
@@ -62,7 +65,10 @@ mod tests {
         );
         for model in crate::parakeet::models::AVAILABLE_MODELS.iter() {
             assert_eq!(
-                supported(model.id, "parakeet", None).len(),
+                supported(model.id, "parakeet", None)
+                    .iter()
+                    .filter(|(code, _)| code != "auto")
+                    .count(),
                 model.languages.len()
             );
         }

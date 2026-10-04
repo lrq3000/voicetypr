@@ -149,6 +149,16 @@ steps, `docs/ARCHITECTURE.md`, `plans/SMOKE.md`, the real-speech harness under
 
 ## Execution notes
 
+- Auto language slice: red/green verified (three selector failures and three
+  native policy/metadata failures before implementation; prompt test exposed
+  and then verified removal of the implicit English instruction). Now 45
+  focused frontend tests, 51 native language tests, TypeScript and oxlint pass.
+  Vulkan-sidecar Rust checking passes. Workspace clippy exceeded the bounded
+  local timeout; no successful clippy result is claimed for that command.
+  Native language tests use application-only test profile overrides
+  `profile.test.package.voicetypr.debug=0` and `opt-level=0` to avoid repeated
+  oversized debug links, then the normal Windows manifest embedding step.
+
 - Founder requested and approved a Windows shipped-bindings prerequisite:
   local `whisper-rs-sys` patch, original checksum-pinned 1.76 MB source archive,
   x64/ARM64 generated snapshots, and native C/Rust ABI checks. The unpatched
