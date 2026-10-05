@@ -149,6 +149,18 @@ steps, `docs/ARCHITECTURE.md`, `plans/SMOKE.md`, the real-speech harness under
 
 ## Execution notes
 
+- Follow-up decision superseding the display-only request below: Parakeet Ultra
+  Q8 is now the first-install default when its runtime is present, and the first
+  automatic choice when downloaded and no model is selected. Existing saved
+  choices win, downloads still require user confirmation, and unavailable Ultra
+  falls back to the established selection policy.
+
+  Follow-up validation: 1,262 frontend tests, typecheck, oxlint, frontend build,
+  workspace/all-target clippy, format, 18 workflow-helper tests and actionlint
+  pass. Native test relinking timed out twice; the earlier full native pass does
+  not certify the final default-policy change. This limitation is recorded for
+  upstream review rather than repeating unbounded local builds.
+
 - Founder-approved follow-up: show Parakeet Ultra Q8 as Recommended in the
   first-install model list and settings, alongside existing recommendations.
   This is a display-only endorsement: onboarding's default-selection policy

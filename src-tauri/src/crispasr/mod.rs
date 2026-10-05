@@ -26,7 +26,7 @@ pub fn model_status(app: &tauri::AppHandle) -> Vec<crate::commands::model::Unifi
             // speed rankings from a single smoke fixture.
             speed_score: 0,
             accuracy_score: 0,
-            recommended: model.id == "confucius4-r2t2-q4_k",
+            recommended: matches!(model.id, models::DEFAULT_MODEL_ID | "confucius4-r2t2-q4_k"),
             engine: "crispasr".into(),
             kind: "local".into(),
             requires_setup: sidecar::runtime_path(app, false).is_none(),

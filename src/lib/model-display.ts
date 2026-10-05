@@ -1,9 +1,10 @@
 import type { ModelInfo } from "@/types";
 
-// Display endorsements can include manual choices without changing onboarding's
-// automatic selection, which still uses the catalog's original recommended flag.
+// Keep aligned with crispasr::models::DEFAULT_MODEL_ID in the native selector.
+export const DEFAULT_LOCAL_MODEL_NAME = "parakeet-ultra-q8_0";
+
 export function hasRecommendedModelLabel(model: ModelInfo): boolean {
-  return model.recommended || model.name === "parakeet-ultra-q8_0";
+  return model.recommended || model.name === DEFAULT_LOCAL_MODEL_NAME;
 }
 
 const KNOWN_MODEL_DISPLAY_NAMES: Record<string, string> = {

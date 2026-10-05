@@ -3,6 +3,9 @@
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
 
+// Keep aligned with DEFAULT_LOCAL_MODEL_NAME in src/lib/model-display.ts.
+pub const DEFAULT_MODEL_ID: &str = "parakeet-ultra-q8_0";
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ModelFamily {
     ParakeetUltra,
@@ -62,7 +65,7 @@ impl ModelDefinition {
 
 pub static MODELS: &[ModelDefinition] = &[
     ModelDefinition {
-        id: "parakeet-ultra-q8_0",
+        id: DEFAULT_MODEL_ID,
         display_name: "Parakeet Ultra Q8",
         family: ModelFamily::ParakeetUltra,
         filename: "parakeet-ultra-q8_0.gguf",

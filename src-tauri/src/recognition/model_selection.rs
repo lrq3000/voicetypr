@@ -227,9 +227,22 @@ pub async fn auto_select_model_if_needed(
         return Ok(());
     }
 
-    let mut selection: Option<(String, String)> = None;
+    // A default is a preference among usable downloads, never permission to
+    // download silently or replace the saved choice handled above.
+    let mut selection = app
+        .try_state::<crate::crispasr::CrispasrManager>()
+        .filter(|manager| {
+            availability.crispasr_available
+                && manager.is_downloaded(crate::crispasr::models::DEFAULT_MODEL_ID)
+        })
+        .map(|_| {
+            (
+                "crispasr".to_string(),
+                crate::crispasr::models::DEFAULT_MODEL_ID.to_string(),
+            )
+        });
 
-    if availability.parakeet_available {
+    if selection.is_none() && availability.parakeet_available {
         if let Some(parakeet_manager) = app.try_state::<parakeet::ParakeetManager>() {
             if let Some(model) = pick_best_parakeet_model(parakeet_manager.list_models()) {
                 selection = Some(("parakeet".to_string(), model));
