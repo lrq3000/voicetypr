@@ -1,5 +1,11 @@
 import type { ModelInfo } from "@/types";
 
+// Display endorsements can include manual choices without changing onboarding's
+// automatic selection, which still uses the catalog's original recommended flag.
+export function hasRecommendedModelLabel(model: ModelInfo): boolean {
+  return model.recommended || model.name === "parakeet-ultra-q8_0";
+}
+
 const KNOWN_MODEL_DISPLAY_NAMES: Record<string, string> = {
   "base.en": "Base (English)",
   "small.en": "Small (English)",

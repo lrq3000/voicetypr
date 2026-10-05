@@ -149,6 +149,11 @@ steps, `docs/ARCHITECTURE.md`, `plans/SMOKE.md`, the real-speech harness under
 
 ## Execution notes
 
+- Founder-approved follow-up: show Parakeet Ultra Q8 as Recommended in the
+  first-install model list and settings, alongside existing recommendations.
+  This is a display-only endorsement: onboarding's default-selection policy
+  continues using the original catalog flag.
+
 - 2026-10-05: implementation and Windows verification complete; packaged desktop,
   native macOS builds/runtime and multilingual/long-speech quality remain
   `NEEDS-SMOKE` in `plans/SMOKE.md` (082-S1–S5). Evidence and exact limitations:

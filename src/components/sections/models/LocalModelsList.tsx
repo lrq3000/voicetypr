@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Spinner } from "@/components/ui/spinner";
-import { getModelDisplayName } from "@/lib/model-display";
+import { getModelDisplayName, hasRecommendedModelLabel } from "@/lib/model-display";
 import { cn } from "@/lib/utils";
 import { Download, Ellipsis, X } from "lucide-react";
 import type { LocalModelActions, ModelEntry } from "./types";
@@ -67,6 +67,7 @@ export function LocalModelsList({
               </p>
               <p className="mt-0.5 truncate text-xs leading-[normal] text-muted-foreground">
                 {detail}
+                {hasRecommendedModelLabel(model) ? " · Recommended" : ""}
               </p>
               {downloadErrors[name] && !usable && progress === undefined ? (
                 <p className="text-xs text-destructive">{downloadErrors[name]}</p>
