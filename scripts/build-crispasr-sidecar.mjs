@@ -21,8 +21,8 @@ if (!['cpu', 'gpu'].includes(variant)) throw new Error('variant must be cpu or g
 const source = path.resolve(values.source ?? path.join(root, '.tmp', 'crispasr-source'));
 const build = path.resolve(values['build-dir'] ?? path.join(root, '.tmp', `crispasr-${target}-${variant}`));
 
-function run(command, args, cwd = root, capture = false) {
-  const result = spawnSync(command, args, { cwd, encoding: 'utf8', stdio: capture ? 'pipe' : 'inherit' });
+function run(command, args, cwd = root, capture = false, env = process.env) {
+  const result = spawnSync(command, args, { cwd, env, encoding: 'utf8', stdio: capture ? 'pipe' : 'inherit' });
   if (result.error) throw result.error;
   if (result.status !== 0) throw new Error(`${command} failed (${result.status})${capture ? `: ${result.stderr}` : ''}`);
   return result.stdout?.trim();
@@ -54,16 +54,19 @@ try {
   if (process.platform === 'win32') configure.push('-A', target.startsWith('aarch64') ? 'ARM64' : 'x64');
   if (process.platform === 'darwin') configure.push('-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0', `-DCMAKE_OSX_ARCHITECTURES=${target.startsWith('aarch64') ? 'arm64' : 'x86_64'}`);
   run('cmake', configure);
-  const buildArgs = ['--build', build, '--config', 'Release', '--parallel', '4', '--target', 'crispasr-sidecar', 'crispasr-audio-test'];
+  const buildArgs = ['--build', build, '--config', 'Release', '--parallel', '4', '--target', 'crispasr-sidecar', 'crispasr-audio-test', 'crispasr-qwen3-failure-test'];
   if (process.platform === 'win32') buildArgs.push('--', '/verbosity:quiet');
   run('cmake', buildArgs);
   run('ctest', ['--test-dir', build, '-C', 'Release', '--output-on-failure']);
   const extension = target.includes('windows') ? '.exe' : '';
   const dist = path.join(root, 'sidecar', 'crispasr', 'dist');
   mkdirSync(dist, { recursive: true });
-  copyFileSync(path.join(build, 'bin', `crispasr-sidecar${extension}`), path.join(dist, `crispasr-sidecar-${variant}-${target}${extension}`));
+  const executable = path.join(dist, `crispasr-sidecar-${variant}-${target}${extension}`);
+  copyFileSync(path.join(build, 'bin', `crispasr-sidecar${extension}`), executable);
   copyFileSync(path.join(source, 'LICENSE'), path.join(dist, 'CrispASR-LICENSE'));
   copyFileSync(path.join(source, 'ggml', 'LICENSE'), path.join(dist, 'ggml-LICENSE'));
+  run(process.execPath, ['--test', path.join(root, 'sidecar/crispasr/tests/protocol.test.mjs')], root, false,
+    { ...process.env, CRISPASR_SIDECAR: executable });
   console.log(`Staged CrispASR ${variant} sidecar for ${target}.`);
 } catch (error) {
   console.error(`[crispasr:build] ${error.message}`);

@@ -26,7 +26,7 @@ endif()
 add_executable(crispasr-sidecar
     "${VOICETYPR_SIDECAR_DIR}/src/main.cpp" "${VOICETYPR_SIDECAR_DIR}/src/session.cpp"
     "${CRISPASR_SOURCE_DIR}/examples/cli/crispasr_backend_parakeet.cpp"
-    "${CRISPASR_SOURCE_DIR}/examples/cli/crispasr_backend_qwen3.cpp")
+    "${VOICETYPR_SIDECAR_DIR}/src/qwen3_adapter.cpp")
 target_compile_features(crispasr-sidecar PRIVATE cxx_std_20)
 target_include_directories(crispasr-sidecar PRIVATE
     "${CRISPASR_SOURCE_DIR}/examples"
@@ -43,3 +43,11 @@ add_executable(crispasr-audio-test "${VOICETYPR_SIDECAR_DIR}/tests/audio.cpp")
 target_compile_features(crispasr-audio-test PRIVATE cxx_std_20)
 target_include_directories(crispasr-audio-test PRIVATE "${VOICETYPR_SIDECAR_DIR}/src")
 add_test(NAME crispasr-audio-codec COMMAND crispasr-audio-test)
+
+add_executable(crispasr-qwen3-failure-test "${VOICETYPR_SIDECAR_DIR}/tests/qwen3-failure.cpp")
+target_compile_features(crispasr-qwen3-failure-test PRIVATE cxx_std_20)
+target_include_directories(crispasr-qwen3-failure-test PRIVATE
+    "${CRISPASR_SOURCE_DIR}/examples" "${CRISPASR_SOURCE_DIR}/examples/cli"
+    "${CRISPASR_SOURCE_DIR}/src" "${CRISPASR_SOURCE_DIR}/include")
+target_link_libraries(crispasr-qwen3-failure-test PRIVATE ggml)
+add_test(NAME crispasr-qwen3-failure COMMAND crispasr-qwen3-failure-test)
