@@ -10,7 +10,7 @@ and an end-to-end Auto spoken-language choice.
 owns model management, process lifecycle and generation-keyed stream results;
 React and native menus reuse the existing model and language surfaces.
 
-**Tech Stack:** Tauri 2, Rust 1.91.1, React 19/TypeScript, C++17/CMake,
+**Tech Stack:** Tauri 2, Rust 1.91.1, React 19/TypeScript, C++20/CMake,
 CrispASR v0.8.41 at `340d7085eaa53c40a46dcb73a6d3d0448a480006`.
 
 ---
@@ -24,51 +24,51 @@ Files: `src-tauri/src/whisper/languages.rs`,
 `src-tauri/src/writing/pipeline.rs`, `src/components/LanguageSelection.tsx`,
 and colocated tests. Keep translation-target language lists separate.
 
-- [ ] Add tests for Auto selection, supported-language filtering, English-only
+- [x] Add tests for Auto selection, supported-language filtering, English-only
   models and explicit-language-only Cohere. In native tests assert:
   ```rust
   assert_eq!(normalize_speech_language_for_model("whisper", "base", "auto"), "auto");
   assert_eq!(normalize_speech_language_for_model("whisper", "base.en", "auto"), "en");
   assert_eq!(TranscriptionTask::Transcribe.fallback_transcript_language(Some("auto")), None);
   ```
-- [ ] Run focused tests and confirm the absent Auto behavior is the failure.
-- [ ] Preserve `auto` in spoken settings, normalize it to an unconstrained
+- [x] Run focused tests and confirm the absent Auto behavior is the failure.
+- [x] Preserve `auto` in spoken settings, normalize it to an unconstrained
   engine request, and pass `Some("")` to Whisper's `FullParams::set_language`.
   Use `WhisperState::full_lang_id_from_state()` (verify the pinned binding's
   spelling before use) for detected-language metadata, without another model
   pass. Missing settings keep the existing English default.
-- [ ] Add Auto to the selector and native menu capability paths; never add it
+- [x] Add Auto to the selector and native menu capability paths; never add it
   to the shared list used for explicit output-language selection. Keep unknown
   transcript output language as `same_as_transcript` in the writing pipeline.
-- [ ] Run `pnpm exec vitest run src/components/LanguageSelection.test.tsx`,
+- [x] Run `pnpm exec vitest run src/components/LanguageSelection.test.tsx`,
   `pnpm typecheck`, and focused Windows language tests with `run-tests.ps1`.
-- [ ] Commit `feat(language): support automatic spoken-language detection`.
+- [x] Commit Auto support (`ee11107c`); startup/model-switch follow-ups in `3ef928c5`.
 
 ## Task 2 — Reproducible native sidecar and protocol
 
-Create `sidecar/crispasr/CMakeLists.txt`, `sidecar/crispasr/src/main.cpp`,
+Create `sidecar/crispasr/targets.cmake`, `sidecar/crispasr/src/main.cpp`,
 `sidecar/crispasr/src/session.{h,cpp}`, `sidecar/crispasr/tests/`,
 `scripts/build-crispasr-sidecar.mjs`, and `sidecar/crispasr/README.md`.
 
-- [ ] Add a protocol harness that sends `status`, an invalid model load, a
+- [x] Add a protocol harness that sends `status`, an invalid model load, a
   stale stream command, and `shutdown`; assert typed responses and clean exit.
   The harness must reject missing executable/invalid JSON as a failed check,
   not as a skipped success.
-- [ ] Build from the pinned upstream source and its pinned ggml dependency.
+- [x] Build from the pinned upstream source and its pinned ggml dependency.
   Keep only the required adapters in the executable where upstream's link
   structure permits. Build CPU first; add Metal/Vulkan configurations.
-- [ ] Implement an owning session class around `CrispasrBackend`:
+- [x] Implement an owning session class around `CrispasrBackend`:
   ```cpp
   std::unique_ptr<CrispasrBackend> backend;
   std::unique_ptr<CrispasrRealtimeSession> stream;
   ```
   Serialize backend access, reuse matching loaded models, explicitly warm,
   and destroy stream state before unloading the backend.
-- [ ] Implement versioned JSON commands and structured errors. Require request
+- [x] Implement versioned JSON commands and structured errors. Require request
   and session identities; validate PCM size/rate and model paths. Keep stdout
   protocol-only and suppress native payload-bearing diagnostics.
-- [ ] Run CTest and the protocol harness against the built CPU executable.
-- [ ] Commit `feat(crispasr): add persistent native inference sidecar`.
+- [x] Run CTest and the protocol harness against the built CPU executable.
+- [x] Commit native sidecar (`4f570fc1`) and checked failure propagation (`206d95a0`).
 
 ## Task 3 — Catalog, downloads and Rust process client
 
@@ -76,19 +76,19 @@ Create `src-tauri/src/crispasr/{mod,models,messages,manager,sidecar}.rs`.
 Modify `src-tauri/src/lib.rs`, `src-tauri/src/commands/model.rs`,
 `src-tauri/src/commands/settings.rs`, `src/types.ts`, and model lifecycle tests.
 
-- [ ] Test the three catalog identities, distinct sizes/checksums, language
+- [x] Test the three catalog identities, distinct sizes/checksums, language
   sets, and downloaded-state handling for missing/partial files.
-- [ ] Pin the HF model revisions and SHA-256s recorded by the upstream tree
+- [x] Pin the HF model revisions and SHA-256s recorded by the upstream tree
   APIs. Use a streaming download and digest, with rename only after validation.
-- [ ] Test protocol IDs, cancellation, timeout and process death using a
+- [x] Test protocol IDs, cancellation, timeout and process termination using a
   committed deterministic fixture process. Implement the client with
   `tokio::process`, bounded requests, `kill_on_drop` and lazy restart.
-- [ ] Register `CrispasrManager` as managed app state, route local lifecycle
+- [x] Register `CrispasrManager` as managed app state, route local lifecycle
   commands to it, and reuse existing progress/error events and UI model rows.
-- [ ] Route preload on selection through the manager and unload on shutdown
+- [x] Route preload on selection through the manager and unload on shutdown
   without disturbing the existing Whisper/remote/media/analytics teardown order.
-- [ ] Run focused native lifecycle tests, model-management Vitest and typecheck.
-- [ ] Commit `feat(models): add Ultra Q8 and quantized R2T2 catalog`.
+- [x] Run focused native lifecycle tests, model-management Vitest and typecheck.
+- [x] Commit catalog in the buildable integration slice (`3ef928c5`).
 
 ## Task 4 — Shared batch execution and capability integration
 
@@ -97,16 +97,16 @@ Modify `src-tauri/src/provider_capabilities.rs`,
 `src-tauri/src/commands/audio.rs`, `src-tauri/src/cli.rs`,
 `src-tauri/src/menu/`, `src-tauri/src/pill/`, and readiness/model consumers.
 
-- [ ] Add dispatch and capability truth-table cases for `crispasr`.
-- [ ] Reject unsupported translate tasks and retain model-specific language
+- [x] Add dispatch and capability truth-table cases for `crispasr`.
+- [x] Reject unsupported translate tasks and retain model-specific language
   sets. Convert native segments/timestamps to `TranscriptionResult` and leave
   missing language/timestamps unknown rather than fabricating values.
-- [ ] Route desktop, uploads and CLI through the same manager. Prepare mono
+- [x] Route desktop, uploads and CLI through the same manager. Prepare mono
   16 kHz input without copying Whisper-only gain/trim/decode parameters.
-- [ ] Test model selection, command routing, unknown model and missing runtime
-  errors, and native menu/readiness behavior.
-- [ ] Run focused executor/model tests and frontend model/readiness tests.
-- [ ] Commit `feat(transcription): route CrispASR local recognition`.
+- [x] Test catalog rejection, Auto/model selection, missing runtime UI, capability
+  and readiness contracts. Packaged entry-point behavior remains 082-S2/S5.
+- [x] Run focused executor/model tests and frontend model/readiness tests.
+- [x] Commit shared recognition routing (`3ef928c5`).
 
 ## Task 5 — Background streams and final authority
 
@@ -114,21 +114,21 @@ Create `src-tauri/src/crispasr/{stream,final_result}.rs`; extend native session
 tests and sidecar handling. Keep wiring in `commands/audio.rs` small by
 placing the new sink/factory and result lifecycle in the engine module.
 
-- [ ] Test final-result admission by generation, model, language, complete
+- [x] Test final-result admission by generation, model, language, complete
   sample coverage and no dropped frames; test cancellation and stale results.
-- [ ] Feed the existing stream tap through the streaming resampler, including
+- [x] Feed the existing stream tap through the streaming resampler, including
   `finish()` at stop. Bound ingress to 5 s and retained stream audio to 120 s.
-- [ ] Implement Parakeet context-preserving preview scheduling with one active
-  decode, conservative stable prefixes and a replaceable tail. Finalize once
+- [x] Implement Parakeet context-preserving preview scheduling with one active
+  decode and a replaceable tentative tail (no premature commits). Finalize once
   over complete audio and deliver that result through the handoff.
-- [ ] Use upstream `create_realtime_session` / `append(..., flush, callback)`
+- [x] Use upstream `create_realtime_session` / `append(..., flush, callback)`
   for R2T2. Keep upstream prefix rollback and language semantics. A valid final
   bypasses batch; invalid/incomplete sessions use complete-file fallback.
-- [ ] Wire background processing independently of preview visibility. Keep
+- [x] Wire background processing independently of preview visibility. Keep
   final inference outside recorder join deadlines and cancel stale work.
-- [ ] Run ordered-audio, overflow, cancellation, final-authority and boundary
+- [x] Run ordered-audio, overflow, cancellation, final-authority and PCM boundary
   tests, followed by a real-speech sidecar stream smoke.
-- [ ] Commit `perf(crispasr): decode during capture and reuse complete stream finals`.
+- [x] Commit background capture/final reuse with shared routing (`3ef928c5`).
 
 ## Task 6 — Packaging and final evidence
 
@@ -136,18 +136,40 @@ Files: `src-tauri/tauri.{macos,windows}.conf.json`, relevant build/CI workflow
 steps, `docs/ARCHITECTURE.md`, `plans/SMOKE.md`, the real-speech harness under
 `scripts/`, and this plan's completion notes.
 
-- [ ] Stage target-qualified sidecars and required runtime libraries through
+- [x] Stage target-qualified sidecars and required runtime licenses through
   the Node build helper; verify CPU fallback does not require a Vulkan driver.
-- [ ] Run `pnpm typecheck`, `pnpm lint`, focused/full relevant Vitest, Windows
+- [x] Run `pnpm typecheck`, `pnpm lint`, focused/full relevant Vitest, Windows
   backend tests, `cargo clippy --workspace --all-targets -- -D warnings`,
   `cargo fmt --check`, and native CTest without forced clean rebuilds.
-- [ ] Run the committed harness on redistributable real speech for every model
+- [x] Run the committed harness on redistributable real speech for every model
   available locally. Record load, first partial, stop-to-final, WER/text and
   stream-vs-batch differences. Record unavailable hardware as `NEEDS-SMOKE`.
-- [ ] Inspect final diff, privacy of diagnostics, source pins, and build
-  outputs; commit the packaging and verification evidence.
+- [x] Inspect final diff, privacy of diagnostics, source pins, and build
+  outputs; package configuration and verification evidence accompany this update.
 
 ## Execution notes
+
+- 2026-10-05: implementation and Windows verification complete; packaged desktop,
+  native macOS builds/runtime and multilingual/long-speech quality remain
+  `NEEDS-SMOKE` in `plans/SMOKE.md` (082-S1–S5). Evidence and exact limitations:
+  `docs/reports/2026-10-05-crispasr.md`.
+- Final gates: 1,788 Windows library tests, 1,259 frontend tests, typecheck,
+  oxlint, frontend production build, workspace/all-target clippy, Rust format,
+  actionlint, CPU/Vulkan CTest and native protocol checks. All three models also
+  pass the Rust-to-native real-speech batch/recording test. Full suites run
+  sequentially with four workers to avoid observed timer contention.
+- Tasks 3–5 landed together in `3ef928c5`: manager registration, engine enum
+  routing and stream ownership reference each other, so the slice remains
+  buildable. Native runtime, native failure handling and packaging are separate
+  commits. No push/release was performed.
+- Native build adaptation: upstream assumes it owns `CMAKE_SOURCE_DIR`, so
+  `targets.cmake` is injected into its pinned root project. The local adapter
+  uses C++20 designated initialization while upstream libraries retain their
+  own build settings. No upstream source edits are required.
+- Review regressions were reproduced before fixes: aborted requests leaving a
+  live child, missed cleanup during preload, Auto lost on React model selection,
+  and encoder/prefill/decoder errors reported as successful native finals. All
+  now pass; follow-up review found no remaining blockers in those fixes.
 
 - Auto language slice: red/green verified (three selector failures and three
   native policy/metadata failures before implementation; prompt test exposed

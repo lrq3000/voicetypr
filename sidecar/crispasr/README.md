@@ -53,3 +53,17 @@ Model accuracy, latency and platform GPU behavior require real-speech smoke
 tests. Passing the protocol tests alone is not evidence of inference quality.
 Local measurements and remaining platform smoke checks are recorded in
 `docs/reports/2026-10-05-crispasr.md`.
+
+The CTest fault-injection harness runs the actual pinned Qwen3 adapter with
+encoder, prefill and decoder failures. `src/qwen3_adapter.cpp` checks native C API
+results at the C++ boundary, including decoder function pointers: an allocation
+or graph failure must produce an error, not an authoritative partial final.
+Upstream source remains unmodified and revision/clean-source checks still apply.
+
+For Rust-to-native real-speech verification, set `CRISPASR_TEST_BINARY`,
+`CRISPASR_TEST_MODEL`, `CRISPASR_TEST_BACKEND` (`parakeet` or `qwen3`),
+`CRISPASR_TEST_AUDIO` (PCM16 WAV) and optionally `CRISPASR_TEST_GPU=1`, then run
+`crispasr::sidecar::tests::real_model_protocol_round_trip` with `--ignored --exact`.
+On Windows, use the manifest-embedded library test executable as described by
+`src-tauri/run-tests.ps1`. The test checks both batch and recording sample coverage,
+nonempty results and monotonic committed text; it does not print transcripts.

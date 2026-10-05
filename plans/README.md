@@ -27,7 +27,7 @@ Verification commands used across all plans: `pnpm typecheck`, `pnpm lint`,
 
 ## Active plans
 
-Plan 082 — IN PROGRESS — claimed OpenCode (OpenAI gpt-6-astra) 2026-10-04: CrispASR-backed Parakeet Ultra Q8_0 and Confucius4-R2T2 Q4_K/Q8_0 on macOS and Windows, background decoding, and Auto spoken language. Founder approved the sidecar design and both R2T2 quantizations. See `082-crispasr-local-engines.md`.
+Plan 082 — LOCAL WINDOWS CHECKS PASSED / NEEDS-SMOKE — OpenCode (OpenAI gpt-6-astra) 2026-10-05: CrispASR-backed Parakeet Ultra Q8_0 and R2T2 Q4_K/Q8_0, background recognition and Auto spoken language implemented. Windows library 1,788 tests, frontend 1,259 tests, native CPU/Vulkan and all three real-model GPU round trips pass. Packaged desktop, macOS builds/runtime and broader speech quality remain 082-S1–S5 in `SMOKE.md`. See `082-crispasr-local-engines.md` and `../docs/reports/2026-10-05-crispasr.md`.
 
 Current audio/streaming continuation: [Plan 069](069-handy-informed-audio-streaming-recovery.md)
 and the [research entry point](../docs/RESEARCH-AND-RECOVERY.md). These reconcile

@@ -1,7 +1,9 @@
 # Plan 082 — CrispASR local engines and Auto spoken language
 
-Status: DESIGN APPROVED IN CONVERSATION — OpenCode (OpenAI gpt-6-astra),
-2026-10-04. Written specification approved by the founder. Baseline:
+Status: IMPLEMENTED — WINDOWS CHECKS PASSED / NEEDS-SMOKE — OpenCode
+(OpenAI gpt-6-astra), 2026-10-05. Packaged desktop, macOS builds/runtime and
+broader real-speech quality remain unverified; see 082-S1–S5 in `SMOKE.md` and
+`../docs/reports/2026-10-05-crispasr.md`. Specification approved 2026-10-04. Baseline:
 `70c904a1`. Branch: `feat/crispasr-auto-language`; worktree:
 `.worktrees/crispasr-auto`.
 
