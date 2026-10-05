@@ -972,6 +972,9 @@ pub async fn save_settings(
         crate::cloud_stt::CloudProvider::from_id(&settings.current_model_engine).is_some();
 
     if !settings.current_model.is_empty() && old_model != settings.current_model {
+        if settings.current_model_engine != "crispasr" {
+            crate::crispasr::unload_if_unselected(app.clone());
+        }
         use crate::commands::model::preload_model;
         use tauri::async_runtime::RwLock as AsyncRwLock;
 
@@ -981,7 +984,9 @@ pub async fn save_settings(
             settings.current_model
         );
 
-        if is_parakeet_engine {
+        if settings.current_model_engine == "crispasr" {
+            crate::crispasr::preload(app.clone(), settings.current_model.clone());
+        } else if is_parakeet_engine {
             // Warm the selected Parakeet model in the background.
             let app_clone = app.clone();
             let model_name = settings.current_model.clone();
@@ -1402,7 +1407,9 @@ pub async fn set_model_from_tray(app: AppHandle, model_name: String) -> Result<(
     // Get current settings
     let mut settings = get_settings(app.clone()).await?;
 
-    let engine = if let Some(p) = crate::cloud_stt::CloudProvider::from_id(&model_name) {
+    let engine = if crate::crispasr::models::get(&model_name).is_some() {
+        "crispasr".to_string()
+    } else if let Some(p) = crate::cloud_stt::CloudProvider::from_id(&model_name) {
         p.id().to_string()
     } else {
         let whisper_state = app.state::<tauri::async_runtime::RwLock<WhisperManager>>();
@@ -1678,6 +1685,13 @@ pub async fn get_transcription_acceleration_status(
         });
     }
 
+    if settings.current_model_engine == "crispasr" {
+        return Ok(app
+            .state::<crate::crispasr::CrispasrManager>()
+            .acceleration_status(&mode)
+            .await);
+    }
+
     #[cfg(not(target_os = "windows"))]
     {
         Ok(crate::whisper::gpu_sidecar::AccelerationRuntimeStatus {
@@ -1716,6 +1730,16 @@ pub async fn test_transcription_acceleration(
     #[cfg(target_os = "windows")]
     {
         let settings = get_settings(app.clone()).await?;
+        if settings.current_model_engine == "crispasr" {
+            return app
+                .state::<crate::crispasr::CrispasrManager>()
+                .test_acceleration(
+                    &app,
+                    &settings.current_model,
+                    &settings.transcription_acceleration,
+                )
+                .await;
+        }
         if settings.current_model_engine != "whisper" {
             return Err(
                 "GPU acceleration testing is only available for local Whisper models.".to_string(),

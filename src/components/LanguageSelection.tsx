@@ -171,7 +171,7 @@ export function LanguageSelection({
   const supportsAuto =
     !englishOnly &&
     supportedLanguages?.length !== 1 &&
-    (engine === "whisper" || engine === "parakeet");
+    (engine === "whisper" || engine === "parakeet" || engine === "crispasr");
   const choices = supportsAuto ? [autoLanguage, ...displayed] : displayed;
 
   return (

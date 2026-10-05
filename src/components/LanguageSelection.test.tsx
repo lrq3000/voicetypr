@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { LanguageSelection } from "@/components/LanguageSelection";
 
 describe("automatic spoken language", () => {
-  it.each(["whisper", "parakeet"] as const)(
+  it.each(["whisper", "parakeet", "crispasr"] as const)(
     "offers Auto for multilingual %s even with a language filter",
     async (engine) => {
       const onValueChange = vi.fn();

@@ -1,6 +1,7 @@
 export type SpeechModelEngine =
   | "whisper"
   | "parakeet"
+  | "crispasr"
   | "soniox"
   | "openai"
   | "groq"

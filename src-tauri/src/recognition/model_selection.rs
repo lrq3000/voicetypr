@@ -11,6 +11,7 @@ use crate::whisper;
 pub struct RecognitionAvailabilitySnapshot {
     pub whisper_available: bool,
     pub parakeet_available: bool,
+    pub crispasr_available: bool,
     pub cloud_selected: bool,
     pub cloud_ready: bool,
     pub remote_selected: bool,
@@ -23,6 +24,7 @@ impl RecognitionAvailabilitySnapshot {
     pub fn any_available(&self) -> bool {
         self.whisper_available
             || self.parakeet_available
+            || self.crispasr_available
             || (self.cloud_selected && self.cloud_ready)
             || self.remote_available
     }
@@ -107,6 +109,14 @@ pub async fn recognition_availability_snapshot(
     RecognitionAvailabilitySnapshot {
         whisper_available,
         parakeet_available,
+        crispasr_available: app
+            .try_state::<crate::crispasr::CrispasrManager>()
+            .is_some_and(|manager| {
+                crate::crispasr::models::MODELS
+                    .iter()
+                    .any(|model| manager.is_downloaded(model.id))
+            })
+            && crate::crispasr::sidecar::runtime_path(app, false).is_some(),
         cloud_selected,
         cloud_ready,
         remote_selected,
@@ -237,6 +247,17 @@ pub async fn auto_select_model_if_needed(
         }
     }
 
+    if selection.is_none() && availability.crispasr_available {
+        if let Some(manager) = app.try_state::<crate::crispasr::CrispasrManager>() {
+            if let Some(model) = crate::crispasr::models::MODELS
+                .iter()
+                .find(|model| manager.is_downloaded(model.id))
+            {
+                selection = Some(("crispasr".to_string(), model.id.to_string()));
+            }
+        }
+    }
+
     if selection.is_none() && availability.cloud_selected && availability.cloud_ready {
         let engine = store
             .get("current_model_engine")
@@ -338,6 +359,7 @@ mod tests {
         let snapshot = RecognitionAvailabilitySnapshot {
             whisper_available: false,
             parakeet_available: false,
+            crispasr_available: false,
             cloud_selected: false,
             cloud_ready: false,
             remote_selected: true,
@@ -354,6 +376,7 @@ mod tests {
         let snapshot = RecognitionAvailabilitySnapshot {
             whisper_available: false,
             parakeet_available: false,
+            crispasr_available: false,
             cloud_selected: false,
             cloud_ready: false,
             remote_selected: true,
@@ -370,6 +393,7 @@ mod tests {
         let snapshot = RecognitionAvailabilitySnapshot {
             whisper_available: false,
             parakeet_available: false,
+            crispasr_available: false,
             cloud_selected: false,
             cloud_ready: false,
             remote_selected: false,
