@@ -2,6 +2,11 @@
 
 ## Scripts Overview
 
+### Windows development rebuild
+- `rebuild-windows-debug.cjs` — recreates application/test outputs after deleting
+  `target/debug`, with a non-mutating plan mode and an API-URL launcher.
+- Purpose, prerequisites, options and examples: [Rebuild Windows debug outputs](../docs/REBUILD-WINDOWS-DEBUG.md).
+
 ### Main Release Scripts
 - `release-separate.sh` - macOS release script (creates version, builds both architectures, creates GitHub release)
 - `release-windows.ps1` - Windows release script (builds NSIS installer, updates existing release)
